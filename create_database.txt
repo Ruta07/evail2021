@@ -1,0 +1,29 @@
+CREATE DATABASE blockchain
+
+CREATE TABLE users (
+   id int,
+   name text(50),
+   public_key text(1024),
+   private_key text(1024)
+)
+
+CREATE TABLE wallets (
+	id int,
+    user_id int,
+    balance int,
+    currency text(50),
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE transactions (
+	id int,
+    sender_id int,
+    recipent_id int,
+    amount int,
+    status text(20),
+    currency text(50),
+    PRIMARY KEY (id),
+    FOREIGN KEY (sender_id) REFERENCES users(id),
+    FOREIGN KEY (recipent_id) REFERENCES users(id)
+);
