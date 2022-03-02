@@ -1,0 +1,30 @@
+CREATE DATABASE blockchain
+
+CREATE TABLE public.users (
+	id serial NOT NULL,
+	"name" varchar(50) NULL,
+	public_key varchar(1024) NULL,
+	private_key varchar(1024) NULL,
+	address varchar(255) NULL,
+	CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE public.wallets (
+	id serial NOT NULL,
+	user_id int4 NOT NULL,
+	total_received int4 NULL,
+	total_sent int4 NULL,
+	balance int4 NULL,
+	unconfirmed_balance int4 NULL,
+	final_balance int4 NULL,
+	CONSTRAINT wallets_pkey PRIMARY KEY (id),
+	CONSTRAINT wallets_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE public.transactions (
+	id serial NOT NULL,
+	sender_private_key varchar(1024) NULL,
+	recipient_address varchar(1024) NULL,
+	amount int4 NULL,
+	CONSTRAINT transactions_pkey PRIMARY KEY (id)
+);
