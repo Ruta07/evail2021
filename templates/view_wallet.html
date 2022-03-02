@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blockchain Frontend</title>
+
+    <link rel="stylesheet" href="/static/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/vendor/DataTables/css/datatables.min.css">
+    <link rel="stylesheet" href="/static/vendor/font-awesome/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a href="#" class="navbar-brand">Blockchain Client</a>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Wallet Generator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/transactions" class="nav-link">Make Transaction</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/wallets" class="nav-link">View Transactions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blockchain Node URL Selector -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card-body">
+            <h4 class="card-title">View Wallet Details</h4>
+            <p class="card-text">Select User to view wallet</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container alert alert-secondary">
+
+        <div class="row">
+          <label class="col-sm-2">Select User :</label>
+          <div class="col-sm-10">
+              <select id="user" name="user">
+              <option value="">-- Select User--</option>
+                  </select>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <input type="button" id="view_wallet" class="btn btn-primary btn-lg" value="View Wallet">
+          </div>
+        </div>
+
+    </div>
+
+    <br>
+    <!-- Blockchain Transactions Table -->
+    <div class="container">
+      <table id="transactions_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+      <tr>
+          <th>Total Received</th>
+          <th>Total Sent</th>
+          <th>Balance</th>
+          <th>Unconfirmed Balance</th>
+          <th>Final Balance</th>
+      </tr>
+      </table>
+        <center><div id="image"></div></center>
+    </div>
+
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/DataTables/js/datatables.min.js"></script>
+    <script src="/static/vendor/DataTables/js/ellipsis.js"></script>
+
+    <script>
+        $(function() {
+            $('#view_wallet').click(function(){
+                $.ajax({
+                    url: "api/v1/wallets/" +  document.getElementById("user").value,
+                    type: 'GET',
+                    success: function(response){
+                        console.log(response);
+                        //Generate Transactions Table
+                        if (document.getElementById("row")){
+                        document.getElementById("row").remove();
+                        }
+                        table = document.getElementById("transactions_table")
+                        let row_2 = document.createElement('tr');
+                        row_2.id = "row"
+                        let row_2_data_1 = document.createElement('td');
+                        row_2_data_1.innerHTML = response["data"]["total_received"];
+                        let row_2_data_2 = document.createElement('td');
+                        row_2_data_2.innerHTML = response["data"]["total_sent"];
+                        let row_2_data_3 = document.createElement('td');
+                        row_2_data_3.innerHTML = response["data"]["balance"];
+                        let row_2_data_4 = document.createElement('td');
+                        row_2_data_4.innerHTML = response["data"]["unconfirmed_balance"];
+                        let row_2_data_5 = document.createElement('td');
+                        row_2_data_5.innerHTML = response["data"]["final_balance"];
+
+                        row_2.appendChild(row_2_data_1);
+                        row_2.appendChild(row_2_data_2);
+                        row_2.appendChild(row_2_data_3);
+                        row_2.appendChild(row_2_data_4);
+                        row_2.appendChild(row_2_data_5);
+                        table.appendChild(row_2);
+
+                        var img = document.createElement('img');
+                        var path = (response["data"]["qr"].replaceAll('C:\\eval_2021\\blockchain\\','')).replaceAll('\\','/');
+                        img.src = path;
+                        document.getElementById('image').appendChild(img);
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+            });
+        });
+            $(document).ready(function() {
+                $.ajax({
+                    url: 'api/v1/users',
+                    type: "GET",
+                    dataType: 'json',
+                    success: function(response) {
+                            console.log(response["data"]);
+                            var user_options = document.getElementById("user");
+                            for (var i = 0; i < response["data"].length; i++) {
+                                var option = document.createElement("OPTION");
+                                option.innerHTML = response["data"][i].name;
+                                option.value = response["data"][i].address;
+                                user_options.options.add(option);
+                                }
+                            },
+                    error: function(error) {
+                        console.log(error);
+                        }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
